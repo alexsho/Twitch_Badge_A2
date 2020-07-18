@@ -9,7 +9,7 @@
 #include "Hardware.h"
 #include "Creds.h"
 #include "Images.h"
-// change
+
 
 
 #define FONT_3X5 0
@@ -44,8 +44,11 @@ secret o;
 
 void setup() { 
   setupHardware();    
-  o.startwifi();
   
+  for(int k=0; k<500; k++) PacmanEats();
+  
+  
+  o.startwifi();
   printStringWithShiftL("  CONNECTED !!!   ", DEBUGPRINTSPEED,4,FONT_8X8); //see chartable for valid characters. all caps a few symbols, etc
   char ipCharArray[20];
   IPAddress ip = WiFi.localIP();
@@ -69,6 +72,62 @@ void loop()
 {
   webSocket.loop();
 }
+
+void pac(int i) {
+	
+
+		for(int k=0; k<i; k++){
+			for (int j=0; j<2;j++)	{	
+			
+			lmd.clear();
+			drawBitmap(mPacArray[j],0); // display pacman with mouth closed
+			lmd.display();
+			delay(750);	
+			}
+		}
+}
+
+
+
+void PacmanEats(){
+//mouth target: (x,y) = (7,8)	
+for(int k=0; k<NUMPIXELS; k++){
+int mouthtargetX = 7;
+int mouthtargetY = 8;
+byte chewtimer=0;
+byte mouthStatus=1;
+
+//set rgb
+getrand();
+for(int j=0; j<=k; j++)setPixelColor(j,Forecolor);
+FastLED.show();
+
+for(int x=numCols-1; x>=mouthtargetX; x--){
+	chewtimer = x-mouthtargetX+1;
+	if(!(chewtimer%3)) mouthStatus = (mouthStatus+1) & 0x01;
+
+	drawBitmap(mPacArray[mouthStatus],0); // display pacman with mouth closed
+	SetLEDxy(x,random(7,9),1);
+	SetLEDxy(x-1,random(7,9),1);
+	lmd.display();
+	delay(90);
+	lmd.clear();
+}
+
+for(int j=0; j<NUMPIXELS; j++){ //fast "ring" on the rgbs
+	getrand();
+	setPixelColor(j,Forecolor);
+	FastLED.show();
+	delay(10);
+}
+ColorFill(0);	//Blank the RGB LEDS
+}
+ColorFill(0);//Blank the RGB LEDS	
+	
+}
+
+
+
 
 
 
